@@ -37,9 +37,26 @@ export default async function ConsoleAssignmentsPage() {
   }
 
   const admin = isAssignAdmin(user);
-  const [pending, recent, staff, partiesPage] = await Promise.all([
-    admin ? listPendingAssignmentRequests() : Promise.resolve([]),
-    listRecentAssignmentRequests(admin ? 40 : 15),
+  const superUser = isSuperAdmin(user.roles);
+  let pending: Awaited<ReturnType<typeof listPendingAssignmentRequests>> = [];
+  let recent: Awaited<ReturnType<typeof listRecentAssignmentRequests>> = [];
+  let listError: string | null = null;
+  try {
+    [pending, recent] = await Promise.all([
+      admin
+        ? listPendingAssignmentRequests()
+        : Promise.resolve(
+            [] as Awaited<ReturnType<typeof listPendingAssignmentRequests>>,
+          ),
+      listRecentAssignmentRequests(admin ? 40 : 15),
+    ]);
+  } catch (e) {
+    listError =
+      e instanceof Error
+        ? e.message
+        : "Could not load assignment requests.";
+  }
+  const [staff, partiesPage] = await Promise.all([
     listAssignableUsers(user),
     listParties({ user, page: 1, pageSize: 80 }),
   ]);
@@ -52,7 +69,11 @@ export default async function ConsoleAssignmentsPage() {
 
   const staffOpts = staff.map((s) => ({
     userId: s.userId,
-    email: s.email + (s.brand && s.brand !== "shared" ? ` · ${s.brand === "binarycapital" ? "Capital" : "Bonds"}` : ""),
+    email:
+      s.email +
+      (s.brand && s.brand !== "shared"
+        ? ` · ${s.brand === "binarycapital" ? "Capital" : "Bonds"}`
+        : ""),
   }));
 
   return (
@@ -62,21 +83,32 @@ export default async function ConsoleAssignmentsPage() {
         title={admin ? "Approvals & assignments" : "Request assignment"}
         description={
           admin
-            ? "Super admin: Approve or Reject pending requests on the right. Direct assign is also available. Same staff cannot receive a client they already own."
+            ? "Employees submit requests → you Approve / Reject on the right. Your left form assigns immediately (no self-approval)."
             : "Request reassignment of a client in your book. Super admin must Approve / Reject before ownership changes."
         }
       />
 
+      {listError ? (
+        <p className="text-[12px] text-[var(--c-bad)]" role="alert">
+          {listError}
+        </p>
+      ) : null}
+
       <div className="grid gap-4 lg:grid-cols-2">
         <CCard>
           <h2 className="mb-2 text-[13px] font-semibold text-[var(--c-ink)]">
-            {admin ? "Request or direct-assign" : "Request reassignment"}
+            {admin ? "Direct assign (instant)" : "Request reassignment"}
           </h2>
           <p className="mb-3 text-[12px] text-[var(--c-ink-3)]">
-            Employees create a pending request. Super admins approve on the
-            right (or use Admin for immediate assign).
+            {admin
+              ? "Super admin only: ownership changes immediately. Brand Chinese wall still applies."
+              : "Creates a pending request. Super admins see it under Approvals to Approve or Reject."}
           </p>
-          <AssignmentRequestForm parties={parties} users={staffOpts} />
+          <AssignmentRequestForm
+            parties={parties}
+            users={staffOpts}
+            directAssign={admin}
+          />
         </CCard>
 
         {admin ? (
@@ -85,11 +117,15 @@ export default async function ConsoleAssignmentsPage() {
               Pending approval — Approve / Reject ({pending.length})
             </h2>
             <p className="mb-3 text-[11px] text-[var(--c-ink-3)]">
-              Super admin action: each card has green-style Approve and Reject.
+              {superUser
+                ? "Firm-wide queue of employee handoff requests."
+                : "Brand-scoped approval queue."}{" "}
+              Each card: ✓ Approve or Reject.
             </p>
             {pending.length === 0 ? (
               <p className="text-[13px] text-[var(--c-ink-3)]">
-                No pending requests.
+                No pending requests. When staff submit a handoff, it appears
+                here.
               </p>
             ) : (
               <ul className="space-y-4">

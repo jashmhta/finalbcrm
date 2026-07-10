@@ -472,6 +472,14 @@ export async function requestPartyAssignment(
     };
   }
 
+  // Super / assign-admin: never queue self-approval — apply ownership now.
+  if (isDirectAssignAdmin(user)) {
+    const fd = new FormData();
+    fd.set("partyId", partyId);
+    fd.set("assigneeUserId", toUserId);
+    return assignParty(undefined, fd);
+  }
+
   try {
     await db.insert(partyAssignmentRequest).values({
       partyId,
@@ -481,7 +489,8 @@ export async function requestPartyAssignment(
       status: "pending",
       note: note ?? null,
     });
-  } catch {
+  } catch (e) {
+    console.error("requestPartyAssignment insert failed", e);
     return {
       error:
         "Could not create request (possible duplicate). Check for an existing pending request.",

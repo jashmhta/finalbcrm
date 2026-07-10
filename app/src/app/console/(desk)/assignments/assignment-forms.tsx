@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import {
+  assignParty,
   requestPartyAssignment,
   reviewPartyAssignment,
 } from "@/features/parties/actions";
@@ -12,9 +13,16 @@ import { CButton } from "@/console/primitives/button";
 export function AssignmentRequestForm({
   parties,
   users,
+  /** Super admins direct-assign immediately (no self-approval queue). */
+  directAssign = false,
 }: {
-  parties: { partyId: string; legalName: string; assignedUserId?: string | null }[];
+  parties: {
+    partyId: string;
+    legalName: string;
+    assignedUserId?: string | null;
+  }[];
   users: { userId: string; email: string }[];
+  directAssign?: boolean;
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
@@ -27,10 +35,16 @@ export function AssignmentRequestForm({
       onSubmit={(e) => {
         e.preventDefault();
         const fd = new FormData(e.currentTarget);
+        // Normalize field names for assignParty (assigneeUserId)
+        if (directAssign && !fd.get("assigneeUserId")) {
+          fd.set("assigneeUserId", String(fd.get("toUserId") ?? ""));
+        }
         start(async () => {
           setError(null);
           setOk(false);
-          const res = await requestPartyAssignment(undefined, fd);
+          const res = directAssign
+            ? await assignParty(undefined, fd)
+            : await requestPartyAssignment(undefined, fd);
           if (res?.error) {
             setError(res.error);
             return;
@@ -77,14 +91,16 @@ export function AssignmentRequestForm({
           ))}
         </select>
       </label>
-      <label className="flex flex-col gap-1.5 text-[12px] font-medium text-[var(--c-ink-2)]">
-        Note (optional)
-        <input
-          name="note"
-          className="h-11 rounded-[var(--c-radius)] bg-[var(--c-bg)] px-3 text-[13px] ring-1 ring-[var(--c-line-strong)]"
-          placeholder="Reason for handoff"
-        />
-      </label>
+      {!directAssign ? (
+        <label className="flex flex-col gap-1.5 text-[12px] font-medium text-[var(--c-ink-2)]">
+          Note (optional)
+          <input
+            name="note"
+            className="h-11 rounded-[var(--c-radius)] bg-[var(--c-bg)] px-3 text-[13px] ring-1 ring-[var(--c-line-strong)]"
+            placeholder="Reason for handoff"
+          />
+        </label>
+      ) : null}
       {error ? (
         <p className="text-[12px] text-[var(--c-bad)]" role="alert">
           {error}
@@ -92,11 +108,19 @@ export function AssignmentRequestForm({
       ) : null}
       {ok ? (
         <p className="text-[12px] text-[var(--c-ok)]">
-          Request submitted for super-admin approval.
+          {directAssign
+            ? "Client assigned immediately (no approval needed)."
+            : "Request submitted — waiting for super-admin Approve / Reject."}
         </p>
       ) : null}
       <CButton type="submit" className="w-full" disabled={pending}>
-        {pending ? "Submitting…" : "Submit for approval"}
+        {pending
+          ? directAssign
+            ? "Assigning…"
+            : "Submitting…"
+          : directAssign
+            ? "Assign now (super)"
+            : "Submit for approval"}
       </CButton>
     </form>
   );

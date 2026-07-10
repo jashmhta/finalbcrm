@@ -65,7 +65,24 @@ export const getCurrentUser = cache(async (): Promise<CrmUser | null> => {
     .where(eq(appUser.userId, s.appUserId));
   if (!profile?.isActive) return null;
 
-  const roles = s.roles ?? [];
+  // Always load roles from DB (JWT can be stale / empty after seed or role edits).
+  const roleRows = await db
+    .select({ name: role.name })
+    .from(userRole)
+    .innerJoin(role, eq(userRole.roleId, role.roleId))
+    .where(
+      and(
+        eq(userRole.userId, s.appUserId),
+        isNull(userRole.validTo),
+        isNull(userRole.deletedAt),
+      ),
+    );
+  const dbRoles = roleRows
+    .map((r) => r.name)
+    .filter((n): n is string => typeof n === "string" && n.length > 0);
+  const jwtRoles = Array.isArray(s.roles) ? s.roles : [];
+  // Union: prefer DB, keep any extra JWT claims
+  const roles = Array.from(new Set([...dbRoles, ...jwtRoles]));
   const desk = (profile.desk as string | null) ?? null;
   // Prefer JWT desk if present, else DB
   const brandScope =
