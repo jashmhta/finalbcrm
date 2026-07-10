@@ -1,0 +1,4 @@
+src/app/reports/loading.tsx
+src/app/reports/page.tsx
+src/app/reports/pipeline/page.tsx
+src/app/reports/revenue/page.tsx

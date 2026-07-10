@@ -1,0 +1,4 @@
+src/app/portfolio/risk-metrics/page.tsx
+src/app/reports/_components/credit-report-view.tsx
+src/app/reports/_components/report-charts-impl.tsx
+src/app/reports/_components/report-charts.tsx

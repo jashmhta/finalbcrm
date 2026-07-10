@@ -1,0 +1,4 @@
+drizzle/0003_rls.sql
+drizzle/0004_rls_fix.sql
+drizzle/0005_indexes.sql
+drizzle/0006_leads.sql

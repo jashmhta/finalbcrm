@@ -1,0 +1,4 @@
+src/app/tasks/[id]/page.tsx
+src/app/tasks/[id]/task-status-form.tsx
+src/app/tasks/new-task-dialog.tsx
+src/app/tasks/page.tsx

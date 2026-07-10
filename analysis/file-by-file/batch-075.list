@@ -1,0 +1,4 @@
+src/features/deals/allocations.ts
+src/features/deals/catalog.ts
+src/features/deals/index.ts
+src/features/deals/queries.ts

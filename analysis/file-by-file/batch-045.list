@@ -1,0 +1,4 @@
+src/app/portal/investor/investor-directory-view.tsx
+src/app/portal/investor/loading.tsx
+src/app/portal/investor/page.tsx
+src/app/portfolio/_components/concentration-view.tsx

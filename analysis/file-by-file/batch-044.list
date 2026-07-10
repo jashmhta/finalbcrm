@@ -1,0 +1,4 @@
+src/app/portal/client/loading.tsx
+src/app/portal/client/page.tsx
+src/app/portal/investor/[id]/investor-charts.tsx
+src/app/portal/investor/[id]/page.tsx

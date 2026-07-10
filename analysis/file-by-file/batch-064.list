@@ -1,0 +1,4 @@
+src/db/schema/auth.ts
+src/db/schema/compliance.ts
+src/db/schema/contact.ts
+src/db/schema/credit.ts

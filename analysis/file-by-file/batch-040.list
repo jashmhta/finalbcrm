@@ -1,0 +1,4 @@
+src/app/onboarding/new/onboarding-wizard.tsx
+src/app/onboarding/new/page.tsx
+src/app/onboarding/onboarding-board-view.tsx
+src/app/onboarding/page.tsx

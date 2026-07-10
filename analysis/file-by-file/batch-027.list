@@ -1,0 +1,4 @@
+src/app/documents/documents-list-view.tsx
+src/app/documents/new-document-dialog.tsx
+src/app/documents/page.tsx
+src/app/error.tsx

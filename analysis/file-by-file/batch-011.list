@@ -1,0 +1,4 @@
+src/__tests__/rbacSegmentation.test.ts
+src/__tests__/reports.test.ts
+src/__tests__/routeSmoke.test.ts
+src/__tests__/scenarioAnalysis.test.ts

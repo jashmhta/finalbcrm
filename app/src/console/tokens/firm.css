@@ -1,0 +1,15 @@
+/* Firm command (shared super_admin) — dual-book neutral day chrome */
+
+.console-root[data-brand="shared"] {
+  --c-bg: #f5f5f4;
+  --c-surface: #ffffff;
+  --c-surface-2: #ececea;
+  --c-ink: #121212;
+  --c-ink-2: #525252;
+  --c-ink-3: #7a7a7a;
+  --c-accent: #1b3a5f;
+  --c-accent-soft: color-mix(in srgb, #1b3a5f 8%, white);
+  --c-on-accent: #ffffff;
+  --c-rail: #e2e2e0;
+  --c-density: firm;
+}

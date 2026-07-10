@@ -1,0 +1,4 @@
+src/app/modeling/scenario/page.tsx
+src/app/modeling/scenario/scenario-lazy.tsx
+src/app/modeling/scenario/scenario.tsx
+src/app/not-found.tsx

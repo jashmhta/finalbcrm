@@ -1,0 +1,4 @@
+src/__tests__/aiSummary.test.ts
+src/__tests__/bondPricing.test.ts
+src/__tests__/kyc.test.ts
+src/__tests__/lboModel.test.ts

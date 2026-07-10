@@ -1,0 +1,4 @@
+src/app/portfolio/_components/edit-limit-dialog.tsx
+src/app/portfolio/_components/limits-view.tsx
+src/app/portfolio/_components/overview-view.tsx
+src/app/portfolio/_components/portfolio-charts-impl.tsx

@@ -1,0 +1,23 @@
+/* Binary Bonds — markets density, day mode (Fortress-class) */
+
+.console-root[data-brand="binarybonds"] {
+  --c-bg: #f4f6f8;
+  --c-surface: #ffffff;
+  --c-surface-2: #e9eef3;
+  --c-ink: #0f1419;
+  --c-ink-2: #4a5560;
+  --c-ink-3: #7a8690;
+  --c-accent: #9a7209;
+  --c-accent-soft: color-mix(in srgb, #b8860b 14%, white);
+  --c-on-accent: #ffffff;
+  --c-rail: #dce3ea;
+  --c-density: dense;
+}
+
+.console-root[data-brand="binarybonds"] .c-table {
+  font-size: 13px;
+}
+
+.console-root[data-brand="binarybonds"] .c-kpi-value {
+  font-size: 1.5rem;
+}

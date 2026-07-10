@@ -1,0 +1,4 @@
+src/db/schema/deals.ts
+src/db/schema/demat.ts
+src/db/schema/documents.ts
+src/db/schema/enums.ts

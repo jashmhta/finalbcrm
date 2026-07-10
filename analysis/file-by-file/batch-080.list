@@ -1,0 +1,4 @@
+src/features/integrations/queries.ts
+src/features/integrations/ratingFeed.ts
+src/features/integrations/registry.ts
+src/features/integrations/types.ts

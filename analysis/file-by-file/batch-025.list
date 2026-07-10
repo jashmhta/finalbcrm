@@ -1,0 +1,4 @@
+src/app/dashboard-exposure-chart.tsx
+src/app/deals/[id]/page.tsx
+src/app/deals/deal-type-credit.ts
+src/app/deals/deal-type-icon.tsx

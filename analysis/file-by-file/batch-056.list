@@ -1,0 +1,4 @@
+src/components/brand/page-shell.tsx
+src/components/brand/page-transition.tsx
+src/components/brand/preview-pane.tsx
+src/components/brand/reveal.tsx

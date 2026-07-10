@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Next.js
+.next/
+out/
+build/
+.vercel/
+
+# Production
+dist/
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Local
+*.local
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Testing / coverage
+coverage/
+
+# Editor / OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+
+# Drizzle
+drizzle/meta/
+
+# Scrape artifacts are tracked intentionally (client research) — do NOT ignore scrape/
+
+# Secrets / keys (never commit)
+*.pem
+*.key
+secrets/
+scrape/
+screenshots/
+.vercel

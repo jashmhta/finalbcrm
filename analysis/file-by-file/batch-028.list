@@ -1,0 +1,4 @@
+src/app/global-error.tsx
+src/app/globals.css
+src/app/integrations/adapter-card.tsx
+src/app/integrations/adapter-meta.ts

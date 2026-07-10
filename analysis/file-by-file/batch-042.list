@@ -1,0 +1,4 @@
+src/app/parties/new-party-dialog.tsx
+src/app/parties/page.tsx
+src/app/parties/parties-list-view.tsx
+src/app/parties/party-icon.tsx

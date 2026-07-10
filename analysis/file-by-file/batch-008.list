@@ -1,0 +1,4 @@
+scripts/screenshot.mjs
+scripts/verify-logo-theme.mjs
+scripts/verify-routes.mjs
+scripts/verify.mjs

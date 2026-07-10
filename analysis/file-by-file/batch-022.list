@@ -1,0 +1,4 @@
+src/app/credit/[id]/credit-summary-header.tsx
+src/app/credit/[id]/page.tsx
+src/app/credit/[id]/run-score-button.tsx
+src/app/credit/[id]/workspace/page.tsx

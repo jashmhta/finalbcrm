@@ -1,0 +1,4 @@
+src/features/deals/roles.ts
+src/features/deals/stages.ts
+src/features/documents/actions.ts
+src/features/documents/queries.ts

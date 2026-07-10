@@ -1,0 +1,366 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Binary CRM — Stripe-level day theme (light only)
+   Cool neutrals, single indigo accent, hairline borders, soft elevation.
+   Dense product UI: performant, calm, no mesh / grain / double-bezel chrome.
+   Token names (--gold, --emerald) kept for app-wide class compatibility;
+   --gold is the primary brand accent (Stripe indigo), not literal gold.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --color-ink: var(--ink);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-hairline: var(--hairline);
+  --color-emerald: var(--emerald);
+  --color-emerald-deep: var(--emerald-deep);
+  --color-gold: var(--gold);
+  --color-gold-deep: var(--gold-deep);
+  --color-up: var(--up);
+  --color-down: var(--down);
+  --color-info: var(--info);
+  --color-on-emerald: var(--on-emerald);
+  --color-on-gold: var(--on-gold);
+
+  --color-row-hover: var(--row-hover);
+  --color-row-stripe: var(--row-stripe);
+  --color-row-hairline: var(--row-hairline);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-geist-sans);
+  --font-heading: var(--font-geist-sans);
+
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.25);
+  --radius-2xl: calc(var(--radius) * 1.5);
+  --radius-3xl: calc(var(--radius) * 2);
+  --radius-4xl: calc(var(--radius) * 2.5);
+}
+
+@theme {
+  --ease-soft: cubic-bezier(0.25, 0.1, 0.25, 1);
+
+  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04);
+  --shadow-lift: 0 4px 12px rgb(15 23 42 / 0.06), 0 1px 2px rgb(15 23 42 / 0.04);
+  --shadow-floating: 0 12px 32px rgb(15 23 42 / 0.1), 0 2px 6px rgb(15 23 42 / 0.04);
+  --shadow-inset-hi: inset 0 1px 0 rgb(255 255 255 / 0.8);
+  --shadow-shell: 0 1px 2px rgb(15 23 42 / 0.04);
+  --shadow-pill: 0 1px 2px rgb(99 91 255 / 0.18);
+  --shadow-nav: 0 0 0 1px rgb(15 23 42 / 0.04), 0 1px 2px rgb(15 23 42 / 0.04);
+  --shadow-sticky: 0 1px 0 rgb(15 23 42 / 0.06);
+}
+
+/* Stripe-like cool day palette */
+:root {
+  --radius: 0.5rem;
+
+  /* Canvas + surfaces */
+  --ink: #f6f9fc;
+  --surface: #ffffff;
+  --surface-2: #f0f4f8;
+  --hairline: rgb(15 23 42 / 0.08);
+
+  /* Primary accent = Stripe indigo (token still named gold for compatibility) */
+  --gold: #635bff;
+  --gold-deep: #4b45c6;
+  --on-gold: #ffffff;
+
+  /* Semantic */
+  --emerald: #0d9488;
+  --emerald-deep: #0f766e;
+  --on-emerald: #ffffff;
+  --up: #0f766e;
+  --down: #df1b41;
+  --info: #0073e6;
+
+  --row-hover: rgb(15 23 42 / 0.03);
+  --row-stripe: rgb(15 23 42 / 0.015);
+  --row-hairline: rgb(15 23 42 / 0.06);
+
+  --background: var(--ink);
+  --foreground: #0a2540;
+  --card: var(--surface);
+  --card-foreground: #0a2540;
+  --popover: var(--surface);
+  --popover-foreground: #0a2540;
+  --primary: var(--gold);
+  --primary-foreground: var(--on-gold);
+  --secondary: var(--surface-2);
+  --secondary-foreground: #0a2540;
+  --muted: var(--surface-2);
+  --muted-foreground: #425466;
+  --accent: rgb(99 91 255 / 0.08);
+  --accent-foreground: var(--gold-deep);
+  --destructive: var(--down);
+  --border: var(--hairline);
+  --input: rgb(15 23 42 / 0.1);
+  --ring: var(--gold);
+  --chart-1: #635bff;
+  --chart-2: #0d9488;
+  --chart-3: #0073e6;
+  --chart-4: #f5a623;
+  --chart-5: #7c3aed;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0a2540;
+  --sidebar-primary: var(--gold);
+  --sidebar-primary-foreground: var(--on-gold);
+  --sidebar-accent: #f0f4f8;
+  --sidebar-accent-foreground: #0a2540;
+  --sidebar-border: rgb(15 23 42 / 0.08);
+  --sidebar-ring: var(--gold);
+}
+
+/* Dark retained for shadcn parity only — app forces light */
+.dark {
+  --radius: 0.5rem;
+  --ink: #0a2540;
+  --surface: #0f2a44;
+  --surface-2: #163452;
+  --hairline: rgb(255 255 255 / 0.1);
+  --gold: #8b85ff;
+  --gold-deep: #a8a3ff;
+  --on-gold: #0a2540;
+  --emerald: #2dd4bf;
+  --emerald-deep: #5eead4;
+  --on-emerald: #042f2e;
+  --up: #2dd4bf;
+  --down: #fb7185;
+  --info: #60a5fa;
+  --row-hover: rgb(255 255 255 / 0.04);
+  --row-stripe: rgb(255 255 255 / 0.02);
+  --row-hairline: rgb(255 255 255 / 0.08);
+  --background: var(--ink);
+  --foreground: #f6f9fc;
+  --card: var(--surface);
+  --card-foreground: #f6f9fc;
+  --popover: var(--surface);
+  --popover-foreground: #f6f9fc;
+  --primary: var(--gold);
+  --primary-foreground: var(--on-gold);
+  --secondary: var(--surface-2);
+  --secondary-foreground: #f6f9fc;
+  --muted: var(--surface-2);
+  --muted-foreground: #a3b3c6;
+  --accent: rgb(139 133 255 / 0.16);
+  --accent-foreground: var(--gold);
+  --destructive: var(--down);
+  --border: var(--hairline);
+  --input: rgb(255 255 255 / 0.12);
+  --ring: var(--gold);
+  --chart-1: #8b85ff;
+  --chart-2: #2dd4bf;
+  --chart-3: #60a5fa;
+  --chart-4: #fbbf24;
+  --chart-5: #c4b5fd;
+  --sidebar: var(--surface);
+  --sidebar-foreground: #f6f9fc;
+  --sidebar-primary: var(--gold);
+  --sidebar-primary-foreground: var(--on-gold);
+  --sidebar-accent: var(--surface-2);
+  --sidebar-accent-foreground: #f6f9fc;
+  --sidebar-border: var(--hairline);
+  --sidebar-ring: var(--gold);
+}
+
+/* Quiet canvas — no mesh, no noise (perf + Stripe cleanliness) */
+@utility bg-mesh {
+  background-image: none;
+  background-color: transparent;
+}
+
+@utility bg-noise {
+  background-image: none;
+}
+
+@utility nums {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+@utility bezel-hi {
+  box-shadow: var(--shadow-inset-hi);
+}
+
+@utility eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    min-height: 100dvh;
+    line-height: 1.5;
+    font-size: 14px;
+  }
+
+  h1, h2, h3, h4 {
+    text-wrap: balance;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: rgb(99 91 255 / 0.18);
+    color: var(--foreground);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(15 23 42 / 0.18) transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(15 23 42 / 0.14);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgb(99 91 255 / 0.45);
+    background-clip: padding-box;
+    border: 2px solid transparent;
+  }
+
+  .font-display {
+    font-family: var(--font-geist-sans);
+    letter-spacing: -0.025em;
+  }
+}
+
+:where(a, button, input, select, textarea, summary, [role="button"], [role="checkbox"], [role="tab"], [role="link"], [tabindex]):focus-visible {
+  outline: 2px solid var(--gold) !important;
+  outline-offset: 2px !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+    --tw-animate-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 40rem) {
+  input[type="text"],
+  input[type="search"],
+  input[type="number"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="date"],
+  input[type="datetime-local"],
+  input[type="time"],
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
+
+@keyframes bc-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.bc-shimmer {
+  background-image: linear-gradient(
+    100deg,
+    rgb(15 23 42 / 0.04) 30%,
+    rgb(99 91 255 / 0.1) 50%,
+    rgb(15 23 42 / 0.04) 70%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: bc-shimmer 1.4s var(--ease-soft) infinite;
+}
+
+/* Page content shell — consistent max width + gutters */
+.bc-page {
+  @apply mx-auto w-full max-w-[1400px] px-4 py-6 md:px-8 md:py-8;
+}
+
+.bc-page-header {
+  @apply mb-6 flex flex-col gap-1 border-b border-hairline pb-5 md:mb-8;
+}
+
+.bc-page-title {
+  @apply text-[22px] font-semibold tracking-[-0.025em] text-foreground md:text-[24px];
+}
+
+.bc-page-subtitle {
+  @apply text-[13.5px] text-muted-foreground;
+}

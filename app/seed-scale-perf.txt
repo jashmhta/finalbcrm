@@ -1,0 +1,10 @@
+
+=== Performance check (listParties-equivalent) ===
+  total parties (non-deleted) : 20009
+  search term                 : ilike '%Infra%' (trigram-indexed)
+  page size / offset          : 25 / 0
+  latency (median of 5)       : 33.7 ms
+  latency (min / max)         : 32.8 / 35.5 ms
+  no-search first-page        : 2.5 ms
+  target                      : < 200 ms
+  result                      : PASS (33.7 ms)

@@ -1,0 +1,4 @@
+src/app/compliance/kyc/[id]/kyc-action-forms.tsx
+src/app/compliance/kyc/[id]/page.tsx
+src/app/compliance/kyc/[id]/status-timeline.tsx
+src/app/compliance/kyc/kyc-board-view.tsx

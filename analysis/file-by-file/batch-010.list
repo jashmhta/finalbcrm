@@ -1,0 +1,4 @@
+src/__tests__/maModel.test.ts
+src/__tests__/matching.test.ts
+src/__tests__/ratingMap.test.ts
+src/__tests__/ratios.test.ts

@@ -1,0 +1,4 @@
+src/app/leads/leads-board-view.tsx
+src/app/leads/new/new-lead-form.tsx
+src/app/leads/new/page.tsx
+src/app/leads/page.tsx

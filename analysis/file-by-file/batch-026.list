@@ -1,0 +1,4 @@
+src/app/deals/deals-board-view.tsx
+src/app/deals/loading.tsx
+src/app/deals/page.tsx
+src/app/documents/[id]/page.tsx

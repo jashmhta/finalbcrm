@@ -1,0 +1,37 @@
+/* Binary Capital — advisory calm, day mode
+   Slight yellow-gold CTAs + warm cream surfaces (consistent desk chrome). */
+
+.console-root[data-brand="binarycapital"] {
+  --c-bg: #faf7ef;
+  --c-surface: #fffcf5;
+  --c-surface-2: #f6efdc;
+  --c-ink: #1a1510;
+  --c-ink-2: #5c5348;
+  --c-ink-3: #8a7f70;
+  /* Slight yellow-gold (warmer than pure bronze) */
+  --c-accent: #c9a227;
+  --c-accent-soft: color-mix(in srgb, #c9a227 18%, #fffcf5);
+  --c-on-accent: #1a1400;
+  --c-rail: #ebe0c4;
+  --c-line: color-mix(in srgb, #8a6a10 10%, transparent);
+  --c-line-strong: color-mix(in srgb, #8a6a10 16%, transparent);
+  --c-density: calm;
+  --c-shadow:
+    0 1px 0 color-mix(in srgb, #a88412 7%, transparent),
+    0 10px 28px color-mix(in srgb, #a88412 9%, transparent);
+  /* Glass dock inherits Capital gold */
+  --c-glass-fill: color-mix(in srgb, #fffcf5 68%, transparent);
+  --c-glass-fill-strong: color-mix(in srgb, #fffcf5 82%, transparent);
+  --c-glass-edge: color-mix(in srgb, #f0e2b0 55%, transparent);
+}
+
+.console-root[data-brand="binarycapital"] .c-kpi-value {
+  letter-spacing: -0.02em;
+}
+
+/* Active nav / pills stay gold-consistent */
+.console-root[data-brand="binarycapital"] .c-mobile-nav__item--active {
+  background: color-mix(in srgb, var(--c-accent) 94%, #5c4200);
+  color: #fffaf0;
+  border-color: color-mix(in srgb, var(--c-accent) 60%, white);
+}

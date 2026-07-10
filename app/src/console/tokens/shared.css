@@ -1,0 +1,300 @@
+/* Shared console tokens — day mode only. Brand files override --c-* accents. */
+
+.console-root {
+  /* Surfaces */
+  --c-bg: #f7f6f3;
+  --c-surface: #ffffff;
+  --c-surface-2: #f0eeea;
+  --c-ink: #141210;
+  --c-ink-2: #5c574f;
+  --c-ink-3: #8a847a;
+  --c-line: color-mix(in srgb, var(--c-ink) 8%, transparent);
+  --c-line-strong: color-mix(in srgb, var(--c-ink) 14%, transparent);
+
+  /* Semantic */
+  --c-ok: #1f6b4a;
+  --c-ok-bg: color-mix(in srgb, var(--c-ok) 12%, white);
+  --c-warn: #9a6b12;
+  --c-warn-bg: color-mix(in srgb, var(--c-warn) 12%, white);
+  --c-bad: #a33b3b;
+  --c-bad-bg: color-mix(in srgb, var(--c-bad) 12%, white);
+  --c-info: #2a5a8a;
+  --c-info-bg: color-mix(in srgb, var(--c-info) 12%, white);
+
+  /* Brand accent defaults (overridden) */
+  --c-accent: #1b3a5f;
+  --c-accent-soft: color-mix(in srgb, var(--c-accent) 10%, white);
+  --c-on-accent: #ffffff;
+  --c-rail: #e8e6e1;
+
+  /* Geometry */
+  --c-radius-sm: 8px;
+  --c-radius: 12px;
+  --c-radius-lg: 16px;
+  --c-radius-pill: 999px;
+  --c-sidebar: 16rem;
+  --c-sidebar-collapsed: 4rem;
+  --c-header-h: 3.5rem;
+  /* Room for circular glass dock + safe-area (clear last cards above dock) */
+  --c-bottom-nav-h: 5.75rem;
+  --c-mobile-nav-item: 2.85rem; /* equal circular CTAs */
+  --c-glass-fill: color-mix(in srgb, var(--c-surface) 62%, transparent);
+  --c-glass-fill-strong: color-mix(in srgb, var(--c-surface) 78%, transparent);
+  --c-glass-edge: color-mix(in srgb, white 55%, var(--c-line));
+  --c-glass-shadow:
+    0 1px 0 color-mix(in srgb, white 40%, transparent) inset,
+    0 8px 28px color-mix(in srgb, var(--c-ink) 12%, transparent),
+    0 2px 8px color-mix(in srgb, var(--c-ink) 8%, transparent);
+
+  /* Type */
+  --c-font: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --c-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Motion */
+  --c-ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --c-dur: 220ms;
+
+  /* Shadow (tinted, soft) */
+  --c-shadow:
+    0 1px 0 color-mix(in srgb, var(--c-ink) 4%, transparent),
+    0 8px 24px color-mix(in srgb, var(--c-ink) 6%, transparent);
+
+  color: var(--c-ink);
+  background: var(--c-bg);
+  font-family: var(--c-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+.console-root * {
+  border-color: var(--c-line);
+}
+
+.console-root ::selection {
+  background: color-mix(in srgb, var(--c-accent) 22%, white);
+  color: var(--c-ink);
+}
+
+/* Primary desk scroll: only this region moves; shell is h-dvh locked */
+.console-root .c-desk-scroll {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  /* Avoid permanent gutter stealing space on mobile */
+  scrollbar-gutter: auto;
+  min-height: 0;
+  flex: 1 1 0%;
+  /* Never let children force page-level horizontal growth */
+  max-width: 100%;
+}
+
+/* Mobile page safety: media, pre, wide widgets stay in bounds */
+.console-root .c-desk-scroll img,
+.console-root .c-desk-scroll svg,
+.console-root .c-desk-scroll video {
+  max-width: 100%;
+  height: auto;
+}
+.console-root .c-desk-scroll pre {
+  max-width: 100%;
+  overflow-x: auto;
+}
+/* Grid/flex children must shrink; otherwise long forms break the page */
+.console-root .c-desk-scroll > *,
+.console-root .c-desk-scroll .grid > *,
+.console-root .c-desk-scroll .flex > * {
+  min-width: 0;
+}
+
+/* Horizontal boards (leads/deals) — intentional x-scroll, not page break */
+.console-root .c-kanban {
+  touch-action: pan-x pan-y;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.console-root .c-kanban__col {
+  scroll-snap-align: start;
+}
+
+/* Wide tables must live inside an overflow-x host, not stretch the page */
+.console-root .c-table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+.console-root .c-desk-scroll::-webkit-scrollbar {
+  width: 10px;
+}
+.console-root .c-desk-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--c-ink) 18%, transparent);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.console-root .c-desk-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .console-root {
+    --c-dur: 0ms;
+  }
+  .console-root *,
+  .console-root *::before,
+  .console-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Root layout still applies md:pl-[var(--sidebar-w)]; console owns its own offset. */
+body.console-active {
+  padding-left: 0 !important;
+}
+
+/*
+ * Desk main (#main-content.c-desk-scroll) MUST keep bottom clearance for the
+ * floating circular glass dock. Never zero padding-bottom here — that trapped
+ * end-of-scroll content under the ~5.25rem dock on mobile.
+ */
+body.console-active .console-root #main-content.c-desk-scroll,
+.console-root #main-content.c-desk-scroll {
+  /* Extra pad so last card clears the floating dock on short viewports */
+  padding-bottom: calc(var(--c-bottom-nav-h) + 1.75rem);
+}
+@media (min-width: 768px) {
+  body.console-active .console-root #main-content.c-desk-scroll,
+  .console-root #main-content.c-desk-scroll {
+    padding-bottom: 2.5rem; /* md:pb-10 */
+  }
+}
+
+/* Mobile header / form density */
+@media (max-width: 767px) {
+  .console-root .c-desk-scroll {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .console-root .c-kpi-value {
+    font-size: 1.45rem;
+  }
+  /* Inputs and selects fill the column; prevent iOS zoom + overflow */
+  .console-root .c-desk-scroll input,
+  .console-root .c-desk-scroll select,
+  .console-root .c-desk-scroll textarea {
+    max-width: 100%;
+    font-size: 16px; /* prevents iOS focus zoom */
+  }
+  .console-root .c-desk-scroll form {
+    max-width: 100%;
+  }
+}
+
+/* ── Mobile liquid-glass circular bottom nav ───────────────────────── */
+.console-root .c-mobile-nav {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  padding: 0 0.75rem calc(0.5rem + env(safe-area-inset-bottom, 0px));
+  /* no solid full-width bar — floating glass dock only */
+  background: transparent;
+  border: none;
+  transition:
+    transform var(--c-dur) var(--c-ease),
+    opacity var(--c-dur) var(--c-ease);
+  will-change: transform, opacity;
+}
+
+.console-root .c-mobile-nav.c-mobile-nav--hidden {
+  transform: translateY(calc(100% + 1.25rem));
+  opacity: 0;
+  pointer-events: none;
+}
+
+.console-root .c-mobile-nav__dock {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  width: min(100%, 22rem);
+  padding: 0.45rem 0.55rem;
+  border-radius: 999px;
+  background: var(--c-glass-fill);
+  backdrop-filter: blur(18px) saturate(1.35);
+  -webkit-backdrop-filter: blur(18px) saturate(1.35);
+  border: 1px solid var(--c-glass-edge);
+  box-shadow: var(--c-glass-shadow);
+}
+
+.console-root .c-mobile-nav__item {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: var(--c-mobile-nav-item);
+  height: var(--c-mobile-nav-item);
+  min-width: var(--c-mobile-nav-item);
+  min-height: var(--c-mobile-nav-item);
+  flex: 0 0 var(--c-mobile-nav-item);
+  border-radius: 999px;
+  color: var(--c-ink-3);
+  background: color-mix(in srgb, var(--c-surface) 35%, transparent);
+  border: 1px solid color-mix(in srgb, white 35%, var(--c-line));
+  box-shadow:
+    0 1px 0 color-mix(in srgb, white 50%, transparent) inset,
+    0 2px 6px color-mix(in srgb, var(--c-ink) 6%, transparent);
+  backdrop-filter: blur(10px) saturate(1.2);
+  -webkit-backdrop-filter: blur(10px) saturate(1.2);
+  transition:
+    transform 160ms var(--c-ease),
+    background 160ms var(--c-ease),
+    color 160ms var(--c-ease),
+    box-shadow 160ms var(--c-ease);
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.console-root .c-mobile-nav__item:active {
+  transform: scale(0.94);
+}
+
+.console-root .c-mobile-nav__item--active {
+  color: var(--c-on-accent);
+  background: color-mix(in srgb, var(--c-accent) 92%, black);
+  border-color: color-mix(in srgb, var(--c-accent) 70%, white);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, white 25%, transparent) inset,
+    0 4px 14px color-mix(in srgb, var(--c-accent) 35%, transparent);
+}
+
+.console-root .c-mobile-nav__label {
+  /* Icons only in circles — keep labels for a11y via aria-label on the link */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (min-width: 768px) {
+  .console-root .c-mobile-nav {
+    display: none;
+  }
+}

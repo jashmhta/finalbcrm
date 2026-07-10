@@ -1,0 +1,4 @@
+src/app/credit/layout.tsx
+src/app/credit/new/new-credit-analysis-form.tsx
+src/app/credit/new/page.tsx
+src/app/credit/page.tsx

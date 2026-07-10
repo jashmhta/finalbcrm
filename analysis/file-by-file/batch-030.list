@@ -1,0 +1,4 @@
+src/app/interactions/[id]/page.tsx
+src/app/interactions/interactions-list-view.tsx
+src/app/interactions/new-interaction-dialog.tsx
+src/app/interactions/page.tsx

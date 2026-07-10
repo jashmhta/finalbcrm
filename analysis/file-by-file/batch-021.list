@@ -1,0 +1,4 @@
+src/app/compliance/kyc/loading.tsx
+src/app/compliance/kyc/page.tsx
+src/app/credit/[id]/add-fs-form.tsx
+src/app/credit/[id]/committee-form.tsx

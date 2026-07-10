@@ -1,0 +1,4 @@
+drizzle/0007_onboarding.sql
+drizzle/0008_users_app_user_id.sql
+drizzle/0009_rls_guc_safe.sql
+drizzle/0010_party_segmentation_rbac_filters.sql
