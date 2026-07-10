@@ -45,9 +45,9 @@ export default async function ConsoleSettingsPage() {
   return (
     <div className="space-y-6">
       <CPageHeader
-        eyebrow="Super admin"
-        title="Settings & data control"
-        description="Firm-critical controls: exports, imports, brand wall, and destructive data ops (password confirmed)."
+        eyebrow="Super admin · password required"
+        title="Settings · edit / delete / clear data"
+        description="Edit any client, soft-delete, or wipe mock / scale / all clients. Every destructive action re-asks for your login password."
       />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">

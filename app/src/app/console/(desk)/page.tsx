@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { ArrowRight } from "@phosphor-icons/react/ssr";
 
 import { requireUser } from "@/lib/rbac";
+import { isSuperAdmin } from "@/lib/org";
 import {
   brandLabel,
   homeQuestion,
@@ -69,6 +70,8 @@ export default async function ConsoleHomePage() {
             { href: "/console/leads", label: "Leads" },
           ];
 
+  const superUser = isSuperAdmin(user.roles);
+
   return (
     <div>
       <CPageHeader
@@ -90,6 +93,40 @@ export default async function ConsoleHomePage() {
           </div>
         }
       />
+
+      {superUser ? (
+        <section
+          className="mb-5 grid gap-2 sm:grid-cols-2"
+          aria-label="Super admin shortcuts"
+        >
+          <Link href="/console/assignments">
+            <CCard className="p-3 transition-colors hover:bg-[var(--c-surface-2)]/50">
+              <div className="flex items-center gap-2">
+                <p className="text-[13px] font-semibold text-[var(--c-ink)]">
+                  Approvals · assign
+                </p>
+                <CBadge tone="warn">Approve / Reject</CBadge>
+              </div>
+              <p className="mt-1 text-[11px] text-[var(--c-ink-3)]">
+                Pending reassignment queue — approve or reject employee requests
+              </p>
+            </CCard>
+          </Link>
+          <Link href="/console/settings">
+            <CCard className="p-3 transition-colors hover:bg-[var(--c-surface-2)]/50">
+              <div className="flex items-center gap-2">
+                <p className="text-[13px] font-semibold text-[var(--c-ink)]">
+                  Settings · data control
+                </p>
+                <CBadge tone="bad">Password</CBadge>
+              </div>
+              <p className="mt-1 text-[11px] text-[var(--c-ink-3)]">
+                Edit / soft-delete clients · clear mock, scale, or all data
+              </p>
+            </CCard>
+          </Link>
+        </section>
+      ) : null}
 
       <section
         aria-label="Key metrics"

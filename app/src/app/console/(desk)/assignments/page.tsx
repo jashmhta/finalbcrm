@@ -59,11 +59,11 @@ export default async function ConsoleAssignmentsPage() {
     <div className="space-y-6">
       <CPageHeader
         eyebrow="Coverage handoff"
-        title="Client assignments"
+        title={admin ? "Approvals & assignments" : "Request assignment"}
         description={
           admin
-            ? "Approve employee reassignment requests, or assign directly. Same staff cannot receive a client they already own."
-            : "Request reassignment of a client in your book. Super admin must approve before ownership changes."
+            ? "Super admin: Approve or Reject pending requests on the right. Direct assign is also available. Same staff cannot receive a client they already own."
+            : "Request reassignment of a client in your book. Super admin must Approve / Reject before ownership changes."
         }
       />
 
@@ -80,10 +80,13 @@ export default async function ConsoleAssignmentsPage() {
         </CCard>
 
         {admin ? (
-          <CCard className="max-h-[70vh] overflow-y-auto">
-            <h2 className="mb-2 text-[13px] font-semibold text-[var(--c-ink)]">
-              Pending approval ({pending.length})
+          <CCard className="max-h-[70vh] overflow-y-auto ring-[var(--c-accent)]/25">
+            <h2 className="mb-1 text-[13px] font-semibold text-[var(--c-ink)]">
+              Pending approval — Approve / Reject ({pending.length})
             </h2>
+            <p className="mb-3 text-[11px] text-[var(--c-ink-3)]">
+              Super admin action: each card has green-style Approve and Reject.
+            </p>
             {pending.length === 0 ? (
               <p className="text-[13px] text-[var(--c-ink-3)]">
                 No pending requests.

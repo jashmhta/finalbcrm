@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { SignOut, MagnifyingGlass, CaretLeft, CaretRight } from "@phosphor-icons/react";
 
 import logoSrc from "@/components/logo.png";
@@ -23,6 +23,11 @@ import {
   MOBILE_NAV_ROOT_CLASS,
   nextMobileNavVisible,
 } from "@/console/lib/mobile-nav-scroll";
+import {
+  adjacentSwipeHref,
+  buildSwipeHrefs,
+  swipeDirectionFromDelta,
+} from "@/console/lib/mobile-nav-swipe";
 import { NavIcon } from "./icons";
 import { CBadge } from "@/console/primitives/badge";
 import { CommandPalette } from "@/console/patterns/command-palette";
@@ -59,14 +64,21 @@ export function ConsoleShell({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [collapsed, setCollapsed] = React.useState(false);
   const [cmdOpen, setCmdOpen] = React.useState(false);
   const [mobileNavVisible, setMobileNavVisible] = React.useState(true);
   const mobile = mobilePrimaryNav(nav);
-  const more = nav.filter((i) => !mobile.some((m) => m.href === i.href));
   const lastScrollTopRef = React.useRef(0);
   const idleTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const mainRef = React.useRef<HTMLElement | null>(null);
+  const touchStartRef = React.useRef<{ x: number; y: number; t: number } | null>(
+    null,
+  );
+  const swipeHrefs = React.useMemo(
+    () => buildSwipeHrefs(mobile, nav),
+    [mobile, nav],
+  );
 
   React.useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -88,6 +100,51 @@ export function ConsoleShell({
       document.documentElement.style.removeProperty("--sidebar-w");
     };
   }, []);
+
+  // Horizontal swipe on mobile desk → previous / next nav module
+  React.useEffect(() => {
+    const el =
+      mainRef.current ??
+      (document.querySelector(".c-desk-scroll") as HTMLElement | null);
+    if (!el) return;
+
+    const onStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      const t = e.touches[0]!;
+      touchStartRef.current = { x: t.clientX, y: t.clientY, t: Date.now() };
+    };
+
+    const onEnd = (e: TouchEvent) => {
+      const start = touchStartRef.current;
+      touchStartRef.current = null;
+      if (!start || e.changedTouches.length !== 1) return;
+      // Ignore multi-second holds / form interactions
+      if (Date.now() - start.t > 800) return;
+      const t = e.changedTouches[0]!;
+      const dx = t.clientX - start.x;
+      const dy = t.clientY - start.y;
+      const dir = swipeDirectionFromDelta(dx, dy);
+      if (!dir) return;
+      // Don't steal swipes starting on interactive controls
+      const target = e.target as HTMLElement | null;
+      if (
+        target?.closest(
+          "input, textarea, select, button, a, [role='dialog'], [data-no-swipe]",
+        )
+      ) {
+        return;
+      }
+      const href = adjacentSwipeHref(pathname, swipeHrefs, dir);
+      if (href) router.push(href);
+    };
+
+    el.addEventListener("touchstart", onStart, { passive: true });
+    el.addEventListener("touchend", onEnd, { passive: true });
+    return () => {
+      el.removeEventListener("touchstart", onStart);
+      el.removeEventListener("touchend", onEnd);
+    };
+  }, [pathname, router, swipeHrefs]);
 
   // Hide liquid-glass dock while desk main is scrolling; restore after idle.
   React.useEffect(() => {
@@ -352,7 +409,12 @@ export function ConsoleShell({
           ref={mainRef}
           id="main-content"
           className="c-desk-scroll min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain px-4 pb-[calc(var(--c-bottom-nav-h)+1.75rem)] pt-4 md:px-8 md:pb-10 md:pt-6"
+          data-swipe-nav="1"
         >
+          {/* Mobile swipe hint once per session */}
+          <p className="mb-2 text-center text-[10px] text-[var(--c-ink-3)] md:hidden">
+            Swipe ← → to switch modules
+          </p>
           {children}
         </main>
       </div>
@@ -397,12 +459,25 @@ export function ConsoleShell({
           })}
           <li className="contents">
             <Link
-              href={more[0]?.href ?? "/console/notifications"}
-              aria-label="More"
-              className={MOBILE_NAV_ITEM_CLASS}
+              href="/console/more"
+              aria-label="More modules"
+              aria-current={
+                pathname.startsWith("/console/more") ? "page" : undefined
+              }
+              className={cn(
+                MOBILE_NAV_ITEM_CLASS,
+                pathname.startsWith("/console/more") &&
+                  MOBILE_NAV_ITEM_ACTIVE_CLASS,
+              )}
               data-testid="mobile-nav-more"
             >
-              <NavIcon name="alerts" className="size-5" />
+              <NavIcon
+                name="admin"
+                className="size-5"
+                weight={
+                  pathname.startsWith("/console/more") ? "fill" : "regular"
+                }
+              />
               <span className="c-mobile-nav__label">More</span>
             </Link>
           </li>

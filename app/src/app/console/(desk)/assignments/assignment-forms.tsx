@@ -129,14 +129,16 @@ export function ReviewAssignmentForm({ requestId }: { requestId: string }) {
         size="sm"
         disabled={pending}
         onClick={() => decide("approve")}
+        data-testid="assign-approve"
       >
-        Approve
+        ✓ Approve
       </CButton>
       <CButton
         type="button"
         size="sm"
-        variant="secondary"
+        variant="danger"
         disabled={pending}
+        data-testid="assign-reject"
         onClick={() => decide("reject")}
       >
         Reject
