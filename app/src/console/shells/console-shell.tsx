@@ -28,6 +28,7 @@ import {
   buildSwipeHrefs,
   swipeDirectionFromDelta,
 } from "@/console/lib/mobile-nav-swipe";
+import { logout } from "@/app/actions/auth";
 import { NavIcon } from "./icons";
 import { AlertsButton } from "./alerts-button";
 import { CBadge } from "@/console/primitives/badge";
@@ -370,17 +371,12 @@ export function ConsoleShell({
                 </div>
               </div>
             ) : null}
-            <form action="/console/logout" method="post">
+            <form action={logout}>
               <button
                 type="submit"
                 className="flex size-8 items-center justify-center rounded-lg text-[var(--c-ink-3)] hover:bg-[var(--c-surface-2)] hover:text-[var(--c-ink)]"
                 aria-label="Sign out"
-                formAction={undefined}
-                onClick={async (e) => {
-                  e.preventDefault();
-                  const { logout } = await import("@/app/actions/auth");
-                  await logout();
-                }}
+                title="Sign out"
               >
                 <SignOut size={16} />
               </button>
@@ -398,11 +394,20 @@ export function ConsoleShell({
           <div className="shrink-0 md:hidden">
             <Image src={logoSrc} alt={brandName} width={28} height={28} />
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-[13px] font-semibold text-[var(--c-ink)] md:hidden">
-              {brandName}
-            </p>
-            <p className="hidden text-[12px] text-[var(--c-ink-3)] md:block">
+          {/* Mobile: tappable search pill (command palette) */}
+          <button
+            type="button"
+            onClick={() => setCmdOpen(true)}
+            className="flex min-w-0 flex-1 items-center gap-2 rounded-full bg-[var(--c-surface)] px-3 py-2 text-left ring-1 ring-[var(--c-line)] md:hidden"
+            aria-label="Search clients and jump"
+          >
+            <MagnifyingGlass size={16} className="shrink-0 text-[var(--c-ink-3)]" />
+            <span className="truncate text-[13px] text-[var(--c-ink-3)]">
+              Search clients…
+            </span>
+          </button>
+          <div className="hidden min-w-0 flex-1 md:block">
+            <p className="text-[12px] text-[var(--c-ink-3)]">
               {user.desk ? `Desk · ${user.desk.replace(/_/g, " ")}` : "Desk"}
               {" · "}
               <span className="text-[var(--c-ink-2)]">{brandName}</span>
@@ -411,12 +416,23 @@ export function ConsoleShell({
           <button
             type="button"
             onClick={() => setCmdOpen(true)}
-            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--c-surface)] text-[var(--c-ink-3)] ring-1 ring-[var(--c-line)] md:hidden"
-            aria-label="Search"
+            className="hidden size-9 shrink-0 items-center justify-center rounded-full bg-[var(--c-surface)] text-[var(--c-ink-3)] ring-1 ring-[var(--c-line)] md:flex"
+            aria-label="Open command palette"
+            title="Search (⌘K)"
           >
             <MagnifyingGlass size={16} />
           </button>
           <AlertsButton initialUnread={unreadCount} />
+          <form action={logout} className="md:hidden">
+            <button
+              type="submit"
+              className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[var(--c-surface)] text-[var(--c-ink-3)] ring-1 ring-[var(--c-line)]"
+              aria-label="Sign out"
+              title="Sign out"
+            >
+              <SignOut size={16} />
+            </button>
+          </form>
         </header>
 
         <main

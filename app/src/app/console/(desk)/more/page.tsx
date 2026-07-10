@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 
 import { requireUser, can } from "@/lib/rbac";
 import { isSuperAdmin } from "@/lib/org";
+import { logout } from "@/app/actions/auth";
 import {
   buildConsoleNav,
   resolveConsoleBrand,
@@ -14,6 +15,7 @@ import {
 import { CPageHeader } from "@/console/patterns/page-header";
 import { CCard } from "@/console/primitives/card";
 import { CBadge } from "@/console/primitives/badge";
+import { CButton } from "@/console/primitives/button";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "More" };
@@ -110,16 +112,28 @@ export default async function ConsoleMorePage() {
       ) : null}
 
       {canCreate ? (
-        <Link href="/console/parties?new=1">
-          <CCard className="p-3 ring-[var(--c-accent)]/30">
-            <p className="text-[14px] font-semibold text-[var(--c-ink)]">
-              + Add client
-            </p>
-            <p className="mt-0.5 text-[12px] text-[var(--c-ink-3)]">
-              Create a company in your book — no super approval needed
-            </p>
-          </CCard>
-        </Link>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <Link href="/console/parties?new=1">
+            <CCard className="p-3 ring-[var(--c-accent)]/30">
+              <p className="text-[14px] font-semibold text-[var(--c-ink)]">
+                + Add client
+              </p>
+              <p className="mt-0.5 text-[12px] text-[var(--c-ink-3)]">
+                Create a company in your book — no super approval needed
+              </p>
+            </CCard>
+          </Link>
+          <Link href="/console/parties/import">
+            <CCard className="p-3">
+              <p className="text-[14px] font-semibold text-[var(--c-ink)]">
+                Bulk import
+              </p>
+              <p className="mt-0.5 text-[12px] text-[var(--c-ink-3)]">
+                Excel / CSV with downloadable headers template
+              </p>
+            </CCard>
+          </Link>
+        </div>
       ) : null}
 
       <section className="space-y-2">
@@ -148,8 +162,32 @@ export default async function ConsoleMorePage() {
         </ul>
       </section>
 
+      <section className="space-y-2">
+        <h2 className="text-[12px] font-semibold uppercase tracking-wide text-[var(--c-ink-3)]">
+          Account
+        </h2>
+        <CCard className="space-y-3 p-3">
+          <div>
+            <p className="text-[14px] font-semibold text-[var(--c-ink)]">
+              {user.name ?? user.email}
+            </p>
+            <p className="text-[12px] text-[var(--c-ink-3)]">{user.email}</p>
+            <p className="mt-1 text-[11px] text-[var(--c-ink-3)]">
+              {user.roles.slice(0, 3).join(" · ")}
+              {user.desk ? ` · ${user.desk.replace(/_/g, " ")}` : ""}
+            </p>
+          </div>
+          <form action={logout}>
+            <CButton type="submit" className="w-full" variant="secondary">
+              Sign out
+            </CButton>
+          </form>
+        </CCard>
+      </section>
+
       <p className="text-center text-[11px] text-[var(--c-ink-3)]">
-        Tip: swipe ← / → on the main desk to cycle modules
+        Tip: swipe ← / → on the main desk to cycle modules · search pill opens
+        command palette
       </p>
     </div>
   );

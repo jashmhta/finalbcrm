@@ -13,12 +13,11 @@ function src(rel: string) {
 }
 
 describe("console mutation path wiring", () => {
-  it("createParty revalidates and redirects under /console when redirectTo set", () => {
+  it("createParty revalidates and redirects under /console to new party 360", () => {
     const t = src("src/features/parties/actions.ts");
     expect(t).toContain('revalidatePath("/console/parties")');
-    expect(t).toContain("redirectTo");
-    expect(t).toContain('startsWith("/console")');
-    expect(t).toContain("`/console/parties/${partyId}`");
+    expect(t).toContain('revalidatePath(`/console/parties/${partyId}`)');
+    expect(t).toContain('redirect(`/console/parties/${partyId}`)');
   });
 
   it("sendToDeal revalidates console matching and deals", () => {
@@ -36,9 +35,8 @@ describe("console mutation path wiring", () => {
     expect(page).toContain('sp.new === "1"');
     expect(page).toContain("NewPartyForm");
     expect(form).toContain("createParty");
-    expect(form).toContain('name="redirectTo"');
-    expect(form).toContain('value="/console/parties"');
     expect(form).toContain('name="legalName"');
+    expect(form).toContain("Add client");
   });
 
   it("winLead revalidates console deals and leads", () => {

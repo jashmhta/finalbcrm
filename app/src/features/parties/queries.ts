@@ -291,8 +291,11 @@ export async function listParties({
   // getPartyListSummary (independent of `q` so the KPI strip reflects the whole
   // master ledger, not just the current search). Fetched in parallel with the
   // per-page enrichment below.
+  // Always scope summary to visibility (brand + ownership). Never use the
+  // unscoped global aggregate for authenticated console users — that leaked
+  // other-brand counts into KPI strips.
   const [summary, typeRows, cityRows, signals] = await Promise.all([
-    canReadAllParties(user) ? getPartyListSummary() : fetchScopedPartyListSummary(user),
+    user ? fetchScopedPartyListSummary(user) : getPartyListSummary(),
     ids.length
       ? db
           .select({ partyId: partyTypeAssignment.partyId, type: partyTypeAssignment.partyType })

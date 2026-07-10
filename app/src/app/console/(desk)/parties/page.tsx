@@ -101,7 +101,7 @@ export default async function ConsolePartiesPage({
                 href="/console/parties/import"
                 className="inline-flex h-10 items-center rounded-[var(--c-radius-pill)] bg-[var(--c-surface)] px-4 text-[13px] font-medium ring-1 ring-[var(--c-line-strong)]"
               >
-                Import CSV
+                Import Excel
               </Link>
             ) : null}
             <Link

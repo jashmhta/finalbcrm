@@ -44,10 +44,34 @@ function tokenize(q: string): string[] {
 function brandClauseSql(user: CrmUser | null | undefined) {
   if (!user) return sql`true`;
   if (isFirmWide(user.brandScope) || isSuperAdmin(user.roles)) {
+    // Super may still be brand-scoped (Capital/Bonds supers) — only firm-wide is true
+    if (isSuperAdmin(user.roles) && isFirmWide(user.brandScope)) {
+      return sql`true`;
+    }
+    if (isSuperAdmin(user.roles) && !isFirmWide(user.brandScope)) {
+      const brands = partyBrandSqlValues(user.brandScope);
+      return sql`p.brand_origin = ANY(ARRAY[${sql.join(
+        brands.map((b) => sql`${b}`),
+        sql`, `,
+      )}]::text[])`;
+    }
+  }
+  if (isFirmWide(user.brandScope)) return sql`true`;
+  const brands = partyBrandSqlValues(user.brandScope);
+  return sql`p.brand_origin = ANY(ARRAY[${sql.join(
+    brands.map((b) => sql`${b}`),
+    sql`, `,
+  )}]::text[])`;
+}
+
+function dealBrandClauseSql(user: CrmUser | null | undefined) {
+  if (!user) return sql`true`;
+  if (isSuperAdmin(user.roles) && isFirmWide(user.brandScope)) return sql`true`;
+  if (isFirmWide(user.brandScope) && can(user, "read_all", "party")) {
     return sql`true`;
   }
   const brands = partyBrandSqlValues(user.brandScope);
-  return sql`p.brand_origin = ANY(ARRAY[${sql.join(
+  return sql`d.brand = ANY(ARRAY[${sql.join(
     brands.map((b) => sql`${b}`),
     sql`, `,
   )}]::text[])`;
@@ -70,11 +94,116 @@ function ownershipClauseSql(user: CrmUser | null | undefined) {
   )`;
 }
 
+function dealOwnershipClauseSql(user: CrmUser | null | undefined) {
+  if (!user?.appUserId) return sql`true`;
+  if (
+    isSuperAdmin(user.roles) ||
+    user.roles.includes("admin") ||
+    can(user, "read_all", "deal") ||
+    can(user, "read_all", "party")
+  ) {
+    return sql`true`;
+  }
+  const uid = user.appUserId;
+  return sql`(
+    d.lead_user_id = ${uid}
+    OR d.credit_analyst_user_id = ${uid}
+    OR d.created_by_user_id = ${uid}
+    OR EXISTS (
+      SELECT 1 FROM deal_party dp
+      INNER JOIN party p ON p.party_id = dp.party_id AND p.deleted_at IS NULL
+      WHERE dp.deal_id = d.deal_id AND dp.deleted_at IS NULL
+        AND (
+          p.assigned_user_id = ${uid}
+          OR p.data_owner_user_id = ${uid}
+          OR p.created_by_user_id = ${uid}
+        )
+    )
+  )`;
+}
+
+function taskOwnershipClauseSql(user: CrmUser | null | undefined) {
+  if (!user?.appUserId) return sql`true`;
+  if (
+    isSuperAdmin(user.roles) ||
+    user.roles.includes("admin") ||
+    can(user, "read_all", "task") ||
+    can(user, "manage", "user")
+  ) {
+    return sql`true`;
+  }
+  const uid = user.appUserId;
+  return sql`(
+    t.assignee_user_id = ${uid}
+    OR t.created_by_user_id = ${uid}
+    OR (
+      t.party_id IS NOT NULL AND EXISTS (
+        SELECT 1 FROM party p
+        WHERE p.party_id = t.party_id AND p.deleted_at IS NULL
+          AND (
+            p.assigned_user_id = ${uid}
+            OR p.data_owner_user_id = ${uid}
+            OR p.created_by_user_id = ${uid}
+          )
+      )
+    )
+    OR (
+      t.deal_id IS NOT NULL AND EXISTS (
+        SELECT 1 FROM deal d
+        WHERE d.deal_id = t.deal_id AND d.deleted_at IS NULL
+          AND (
+            d.lead_user_id = ${uid}
+            OR d.credit_analyst_user_id = ${uid}
+            OR d.created_by_user_id = ${uid}
+          )
+      )
+    )
+  )`;
+}
+
+function interactionOwnershipClauseSql(user: CrmUser | null | undefined) {
+  if (!user?.appUserId) return sql`true`;
+  if (
+    isSuperAdmin(user.roles) ||
+    user.roles.includes("admin") ||
+    can(user, "read_all", "interaction") ||
+    can(user, "manage", "user")
+  ) {
+    return sql`true`;
+  }
+  const uid = user.appUserId;
+  return sql`(
+    i.user_id = ${uid}
+    OR (
+      i.party_id IS NOT NULL AND EXISTS (
+        SELECT 1 FROM party p
+        WHERE p.party_id = i.party_id AND p.deleted_at IS NULL
+          AND (
+            p.assigned_user_id = ${uid}
+            OR p.data_owner_user_id = ${uid}
+            OR p.created_by_user_id = ${uid}
+          )
+      )
+    )
+    OR (
+      i.deal_id IS NOT NULL AND EXISTS (
+        SELECT 1 FROM deal d
+        WHERE d.deal_id = i.deal_id AND d.deleted_at IS NULL
+          AND (
+            d.lead_user_id = ${uid}
+            OR d.credit_analyst_user_id = ${uid}
+            OR d.created_by_user_id = ${uid}
+          )
+      )
+    )
+  )`;
+}
+
 /**
  * Search-engine style multi-entity search.
  * - Tokenizes query
  * - Ranks exact prefix > starts-with > contains > fuzzy-ish token hits
- * - Scopes by brand + ownership for employees
+ * - Scopes by brand + ownership for employees (0 cross-book leakage)
  */
 export async function globalSearch(
   qRaw: string,
@@ -95,6 +224,10 @@ export async function globalSearch(
 
   const brand = brandClauseSql(user);
   const ownership = ownershipClauseSql(user);
+  const dealBrand = dealBrandClauseSql(user);
+  const dealOwn = dealOwnershipClauseSql(user);
+  const taskOwn = taskOwnershipClauseSql(user);
+  const ixOwn = interactionOwnershipClauseSql(user);
 
   const hits: SearchHit[] = [];
 
@@ -151,7 +284,6 @@ export async function globalSearch(
       : ((partyRows as { rows?: typeof partyRows }).rows ?? []);
 
     for (const r of rows as typeof partyRows) {
-      const isLead = false; // refined below if lead_meta
       hits.push({
         kind: "party",
         id: r.party_id,
@@ -160,7 +292,7 @@ export async function globalSearch(
           .filter(Boolean)
           .join(" · "),
         href: `/console/parties/${r.party_id}`,
-        score: Number(r.score) + (isLead ? 0 : 0),
+        score: Number(r.score),
         badges: ["Client"],
       });
     }
@@ -223,7 +355,7 @@ export async function globalSearch(
     }
   }
 
-  // --- Deals / mandates ---
+  // --- Deals / mandates (brand + ownership scoped — no firm-wide leak) ---
   if (can(user, "read", "deal")) {
     const dealRows = await db.execute<{
       deal_id: string;
@@ -251,6 +383,8 @@ export async function globalSearch(
         )::int AS score
       FROM deal d
       WHERE d.deleted_at IS NULL
+        AND ${dealBrand}
+        AND ${dealOwn}
         AND (
           d.deal_code ILIKE ${like}
           OR d.deal_name ILIKE ${like}
@@ -278,7 +412,7 @@ export async function globalSearch(
     }
   }
 
-  // --- Tasks ---
+  // --- Tasks (assignee / creator / linked party|deal ownership) ---
   if (can(user, "read", "task")) {
     const taskRows = await db.execute<{
       task_id: string;
@@ -302,6 +436,7 @@ export async function globalSearch(
         )::int AS score
       FROM task t
       WHERE t.deleted_at IS NULL
+        AND ${taskOwn}
         AND t.title ILIKE ${like}
       ORDER BY score DESC
       LIMIT 10
@@ -322,7 +457,7 @@ export async function globalSearch(
     }
   }
 
-  // --- Interactions ---
+  // --- Interactions (owner / linked party|deal) ---
   if (can(user, "read", "interaction")) {
     const ixRows = await db.execute<{
       interaction_id: string;
@@ -344,6 +479,7 @@ export async function globalSearch(
         )::int AS score
       FROM interaction i
       WHERE i.deleted_at IS NULL
+        AND ${ixOwn}
         AND (
           i.subject ILIKE ${like}
           OR i.body ILIKE ${like}

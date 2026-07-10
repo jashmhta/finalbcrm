@@ -13,7 +13,17 @@ if (!process.env.DATABASE_URL) {
     const env = readFileSync(resolve(process.cwd(), ".env.local"), "utf8");
     for (const line of env.split("\n")) {
       const m = /^([A-Z0-9_]+)=(.*)$/.exec(line.trim());
-      if (m && !process.env[m[1]]) process.env[m[1]] = m[2];
+      if (m && !process.env[m[1]!]) {
+        let v = m[2] ?? "";
+        // Strip surrounding quotes from .env values
+        if (
+          (v.startsWith('"') && v.endsWith('"')) ||
+          (v.startsWith("'") && v.endsWith("'"))
+        ) {
+          v = v.slice(1, -1);
+        }
+        process.env[m[1]!] = v;
+      }
     }
   } catch {
     /* ignore */

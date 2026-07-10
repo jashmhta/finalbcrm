@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import {
-  importClientsCsv,
+  importClientsBulk,
   type ImportClientsResult,
 } from "@/features/parties/import-clients";
 import { CButton } from "@/console/primitives/button";
@@ -13,6 +13,7 @@ export function ImportClientsForm() {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [result, setResult] = useState<ImportClientsResult | null>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
 
   return (
     <form
@@ -21,22 +22,30 @@ export function ImportClientsForm() {
         e.preventDefault();
         const fd = new FormData(e.currentTarget);
         start(async () => {
-          const res = await importClientsCsv(undefined, fd);
+          const res = await importClientsBulk(undefined, fd);
           setResult(res);
           if (res.ok) router.refresh();
         });
       }}
     >
       <label className="flex flex-col gap-1.5 text-[12px] font-medium text-[var(--c-ink-2)]">
-        CSV file
+        Excel or CSV file
         <input
           type="file"
           name="file"
-          accept=".csv,text/csv"
+          accept=".csv,.xlsx,.xls,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
           required
+          onChange={(e) => setFileName(e.target.files?.[0]?.name ?? null)}
           className="block w-full text-[13px] file:mr-3 file:rounded-full file:border-0 file:bg-[var(--c-accent-soft)] file:px-3 file:py-1.5 file:text-[12px] file:font-medium file:text-[var(--c-accent)]"
         />
       </label>
+      {fileName ? (
+        <p className="text-[11px] text-[var(--c-ink-3)]">Selected: {fileName}</p>
+      ) : (
+        <p className="text-[11px] text-[var(--c-ink-3)]">
+          Max 2,000 rows · 8 MB · headers must match the template
+        </p>
+      )}
       <CButton type="submit" className="w-full" disabled={pending}>
         {pending ? "Importing…" : "Import clients"}
       </CButton>
