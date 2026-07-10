@@ -95,6 +95,8 @@ export async function markAsRead(entityId: string): Promise<MarkReadResult> {
   }
   await persistDismissal(user?.appUserId, [entityId]);
   revalidatePath("/notifications");
+  revalidatePath("/console/notifications");
+  revalidatePath("/console");
   return { ok: true };
 }
 
@@ -134,6 +136,8 @@ export async function markAllAsRead(
   await persistDismissal(userForPersist?.appUserId, toMark);
 
   revalidatePath("/notifications");
+  revalidatePath("/console/notifications");
+  revalidatePath("/console");
   return { ok: true, dismissed: toMark.length };
 }
 

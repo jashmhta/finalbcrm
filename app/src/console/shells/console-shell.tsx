@@ -29,6 +29,7 @@ import {
   swipeDirectionFromDelta,
 } from "@/console/lib/mobile-nav-swipe";
 import { NavIcon } from "./icons";
+import { AlertsButton } from "./alerts-button";
 import { CBadge } from "@/console/primitives/badge";
 import { CommandPalette } from "@/console/patterns/command-palette";
 
@@ -56,11 +57,14 @@ export function ConsoleShell({
   brand,
   nav,
   user,
+  unreadCount = 0,
   children,
 }: {
   brand: ConsoleBrand;
   nav: NavItemDef[];
   user: ConsoleShellUser;
+  /** Unread alerts for header / sidebar badge */
+  unreadCount?: number;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -300,12 +304,28 @@ export function ConsoleShell({
                     {active ? (
                       <span className="absolute left-0 top-1.5 h-6 w-[3px] rounded-r bg-[var(--c-accent)]" />
                     ) : null}
-                    <NavIcon
-                      name={item.icon}
-                      className="size-[18px] shrink-0"
-                      weight={active ? "fill" : "regular"}
-                    />
-                    {!collapsed ? <span className="truncate">{item.label}</span> : null}
+                    <span className="relative shrink-0">
+                      <NavIcon
+                        name={item.icon}
+                        className="size-[18px]"
+                        weight={active ? "fill" : "regular"}
+                      />
+                      {item.icon === "alerts" && unreadCount > 0 ? (
+                        <span className="absolute -right-1.5 -top-1.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-[var(--c-bad)] px-0.5 text-[8px] font-bold text-white">
+                          {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                      ) : null}
+                    </span>
+                    {!collapsed ? (
+                      <span className="flex min-w-0 flex-1 items-center gap-1.5 truncate">
+                        <span className="truncate">{item.label}</span>
+                        {item.icon === "alerts" && unreadCount > 0 ? (
+                          <span className="ml-auto shrink-0 rounded-full bg-[var(--c-bad)] px-1.5 py-0.5 text-[10px] font-bold text-white">
+                            {unreadCount > 99 ? "99+" : unreadCount}
+                          </span>
+                        ) : null}
+                      </span>
+                    ) : null}
                   </Link>
                 </li>
               );
@@ -396,13 +416,7 @@ export function ConsoleShell({
           >
             <MagnifyingGlass size={16} />
           </button>
-          <Link
-            href="/console/notifications"
-            className="flex size-9 shrink-0 items-center justify-center rounded-full text-[var(--c-ink-2)] hover:bg-[var(--c-surface-2)]"
-            aria-label="Alerts"
-          >
-            <NavIcon name="alerts" className="size-5" />
-          </Link>
+          <AlertsButton initialUnread={unreadCount} />
         </header>
 
         <main

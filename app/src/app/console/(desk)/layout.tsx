@@ -7,6 +7,7 @@ import {
   parseBrandPref,
 } from "@/console/lib/brand-pref";
 import { requireUser } from "@/lib/rbac";
+import { getBellData } from "@/features/workflow/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -30,10 +31,19 @@ export default async function ConsoleDeskLayout({
     brandPref,
   });
 
+  let unreadCount = 0;
+  try {
+    const bell = await getBellData(1);
+    unreadCount = bell.unreadCount;
+  } catch {
+    unreadCount = 0;
+  }
+
   return (
     <ConsoleShell
       brand={brand}
       nav={nav}
+      unreadCount={unreadCount}
       user={{
         name: user.name,
         email: user.email,
