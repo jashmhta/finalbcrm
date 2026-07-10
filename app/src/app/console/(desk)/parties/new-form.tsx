@@ -83,7 +83,7 @@ export function NewPartyForm() {
         </p>
       ) : null}
       <CButton type="submit" disabled={pending} className="w-full">
-        {pending ? "Creating…" : "Create party"}
+        {pending ? "Adding…" : "Add client"}
       </CButton>
     </form>
   );

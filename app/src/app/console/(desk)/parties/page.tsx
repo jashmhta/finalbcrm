@@ -161,7 +161,7 @@ export default async function ConsolePartiesPage({
         <CEmpty
           title="No parties yet"
           body="Create the first counterparty for your desk book."
-          actionLabel={can(user, "create", "party") ? "New party" : undefined}
+          actionLabel={can(user, "create", "party") ? "Add client" : undefined}
           actionHref={
             can(user, "create", "party") ? "/console/parties?new=1" : undefined
           }

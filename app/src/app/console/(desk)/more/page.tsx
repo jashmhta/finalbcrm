@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
 
-import { requireUser } from "@/lib/rbac";
+import { requireUser, can } from "@/lib/rbac";
 import { isSuperAdmin } from "@/lib/org";
 import {
   buildConsoleNav,
@@ -38,6 +38,7 @@ export default async function ConsoleMorePage() {
     brandPref,
   });
   const superUser = isSuperAdmin(user.roles);
+  const canCreate = can(user, "create", "party");
 
   const superLinks = superUser
     ? [
