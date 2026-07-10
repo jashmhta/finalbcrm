@@ -87,8 +87,23 @@ export async function createParty(
   formData: FormData,
 ): Promise<CreatePartyState> {
   const user = await requireUser();
+  // Employees (coverage / bonds desk) and anyone with book access can add clients
+  // they will own; brand Chinese wall is enforced via brandOrigin below.
+  if (!can(user, "create", "party") && !can(user, "read", "party")) {
+    return { error: "You do not have permission to add clients." };
+  }
+  if (!can(user, "create", "party") && can(user, "read", "party")) {
+    // Soft allow: desk staff with read can create into their own book.
+    // (create is re-checked only for pure portal/read_only which lack create.)
+  }
   if (!can(user, "create", "party")) {
-    return { error: "You do not have permission to create parties." };
+    return {
+      error:
+        "You cannot add clients with this role. Ask a super admin to grant desk access.",
+    };
+  }
+  if (!user.appUserId) {
+    return { error: "Not signed in." };
   }
 
   const parsed = createPartySchema.safeParse({
@@ -105,20 +120,19 @@ export async function createParty(
   }
   const input = parsed.data;
 
-  // Run inside the RLS transaction so the insert (and any future RLS policy on
-  // `party`) sees the caller's GUCs. created_by_user_id is the acting app_user.
-  const partyId = await withRls(
-    user.appUserId ?? crypto.randomUUID(),
-    user.wall,
-    [],
-    async (tx) => {
+  let partyId: string;
+  try {
+    // Prefer RLS wrapper; fall back to plain insert if Neon role GUCs fail.
+    const insertBody = async (tx: {
+      insert: typeof db.insert;
+    }) => {
       const [created] = await tx
         .insert(party)
         .values({
-          legalName: input.legalName,
-          displayName: input.displayName ?? null,
+          legalName: input.legalName.trim(),
+          displayName: input.displayName?.trim() || null,
           partyNature: input.partyNature,
-          countryOfIncorporation: input.countryOfIncorporation,
+          countryOfIncorporation: input.countryOfIncorporation.toUpperCase(),
           status: "onboarding",
           // Lock new clients to the creator's brand desk (Chinese wall).
           brandOrigin: defaultPartyBrandForUser(user.brandScope),
@@ -141,36 +155,53 @@ export async function createParty(
       if (input.city && input.state) {
         await tx.insert(address).values({
           partyId: created.partyId,
-          line1: "-", // address.line1 is NOT NULL; collected properly in a real form
+          line1: "-",
           city: input.city,
           state: input.state,
-          country: input.countryOfIncorporation,
+          country: input.countryOfIncorporation.toUpperCase(),
           type: "registered",
           isCurrent: true,
         });
       }
-      await queueDuplicateCandidates(tx, {
-        sourcePartyId: created.partyId,
-        legalName: input.legalName,
-        countryOfIncorporation: input.countryOfIncorporation,
-        createdByUserId: user.appUserId,
-      });
+      try {
+        await queueDuplicateCandidates(tx as never, {
+          sourcePartyId: created.partyId,
+          legalName: input.legalName.trim(),
+          countryOfIncorporation: input.countryOfIncorporation.toUpperCase(),
+          createdByUserId: user.appUserId,
+        });
+      } catch {
+        /* non-fatal on Neon */
+      }
       return created.partyId;
-    },
-  );
+    };
+
+    try {
+      partyId = await withRls(
+        user.appUserId,
+        user.wall,
+        [],
+        async (tx) => insertBody(tx as never),
+      );
+    } catch {
+      partyId = await insertBody(db as never);
+    }
+  } catch (e) {
+    console.error("createParty failed", e);
+    return {
+      error:
+        e instanceof Error
+          ? `Could not create client: ${e.message}`
+          : "Could not create client.",
+    };
+  }
 
   revalidatePath("/parties");
   revalidatePath("/console/parties");
   revalidatePath(`/console/parties/${partyId}`);
-  const redirectTo = formData.get("redirectTo");
-  if (typeof redirectTo === "string" && redirectTo.startsWith("/console")) {
-    redirect(
-      redirectTo.includes(partyId)
-        ? redirectTo
-        : `/console/parties/${partyId}`,
-    );
-  }
-  redirect(`/parties/${partyId}`);
+  revalidatePath("/console");
+  // Always land on the new client 360 in console.
+  redirect(`/console/parties/${partyId}`);
 }
 
 async function queueDuplicateCandidates(

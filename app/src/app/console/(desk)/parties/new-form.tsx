@@ -16,9 +16,23 @@ export function NewPartyForm() {
       action={action}
       className="space-y-3 rounded-[var(--c-radius-lg)] bg-[var(--c-surface)] p-5 ring-1 ring-[var(--c-line)]"
     >
-      <input type="hidden" name="redirectTo" value="/console/parties" />
-      <CInput label="Legal name" name="legalName" required maxLength={200} />
-      <CInput label="Display name" name="displayName" maxLength={200} />
+      <p className="text-[12px] text-[var(--c-ink-3)]">
+        Adds a client to <strong>your book</strong> (you become owner). Brand is
+        set from your desk (Capital / Bonds). Super admin is not required.
+      </p>
+      <CInput
+        label="Legal name"
+        name="legalName"
+        required
+        maxLength={200}
+        placeholder="e.g. Acme Infra Pvt Ltd"
+      />
+      <CInput
+        label="Display name"
+        name="displayName"
+        maxLength={200}
+        placeholder="Optional short name"
+      />
       <label className="flex flex-col gap-1.5 text-[12px] font-medium text-[var(--c-ink-2)]">
         Nature
         <select

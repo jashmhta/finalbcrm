@@ -93,7 +93,7 @@ export default async function ConsolePartiesPage({
       <CPageHeader
         eyebrow="Master data"
         title={book === "investor" ? "Investor book" : "Client book"}
-        description={`${total.toLocaleString("en-IN")} counterparties in your brand scope · RBAC-segregated.`}
+        description={`${total.toLocaleString("en-IN")} counterparties in your brand scope · employees can add clients to their own book.`}
         actions={
           <div className="flex flex-wrap gap-2">
             {can(user, "create", "party") ? (
@@ -123,7 +123,7 @@ export default async function ConsolePartiesPage({
                   href="/console/parties?new=1"
                   className="inline-flex h-10 items-center rounded-[var(--c-radius-pill)] bg-[var(--c-accent)] px-4 text-[13px] font-medium text-[var(--c-on-accent)]"
                 >
-                  New party
+                  + Add client
                 </Link>
               )
             ) : null}
@@ -134,7 +134,7 @@ export default async function ConsolePartiesPage({
       {showCreate ? (
         <div className="mb-6 max-w-lg">
           <h2 className="mb-3 text-[14px] font-semibold text-[var(--c-ink)]">
-            Create party
+            Add client
           </h2>
           <NewPartyForm />
         </div>

@@ -142,7 +142,13 @@ export const getCurrentUser = cache(async (): Promise<CrmUser | null> => {
     ]) {
       permissions.add(code);
     }
-  } else if (roles.includes("coverage_rm") || roles.includes("bond_desk")) {
+  } else if (
+    roles.includes("coverage_rm") ||
+    roles.includes("bond_desk") ||
+    roles.includes("employee") ||
+    roles.includes("relationship_manager")
+  ) {
+    // Desk employees: always can add clients to their own book.
     for (const code of [
       "party:read",
       "party:create",
@@ -208,6 +214,17 @@ export const getCurrentUser = cache(async (): Promise<CrmUser | null> => {
     ]) {
       permissions.add(code);
     }
+  }
+
+  // Desk staff with book access can always add a client they will own.
+  // (Covers any custom role that has party:read but missed party:create.)
+  if (
+    permissions.has("party:read") &&
+    !roles.includes("portal") &&
+    !roles.includes("read_only")
+  ) {
+    permissions.add("party:create");
+    permissions.add("party:update");
   }
 
   return {

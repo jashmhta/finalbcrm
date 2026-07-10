@@ -108,6 +108,19 @@ export default async function ConsoleMorePage() {
         </section>
       ) : null}
 
+      {canCreate ? (
+        <Link href="/console/parties?new=1">
+          <CCard className="p-3 ring-[var(--c-accent)]/30">
+            <p className="text-[14px] font-semibold text-[var(--c-ink)]">
+              + Add client
+            </p>
+            <p className="mt-0.5 text-[12px] text-[var(--c-ink-3)]">
+              Create a company in your book — no super approval needed
+            </p>
+          </CCard>
+        </Link>
+      ) : null}
+
       <section className="space-y-2">
         <h2 className="text-[12px] font-semibold uppercase tracking-wide text-[var(--c-ink-3)]">
           All destinations
